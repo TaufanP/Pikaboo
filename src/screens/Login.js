@@ -22,7 +22,9 @@ const Login = props => {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      await firebase.auth().signInWithEmailAndPassword(email, password);
+      await firebase
+        .auth()
+        .signInWithEmailAndPassword(email, password)
       setLoading(false);
       props.navigation.navigate('Enter');
     } catch (e) {
@@ -72,7 +74,8 @@ const Login = props => {
           </View>
         </View>
         <View style={styles.subCont}>
-          <TouchableOpacity onPress = {()=>props.navigation.navigate('Register')}>
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate('Register')}>
             <Text style={styles.subButton}>
               Does not have an account?{' '}
               <Text style={{color: colors.primary}}>SIGN UP</Text>
