@@ -26,7 +26,10 @@ const ChatRoom = props => {
       .push()
       .set({
         msg: messages,
-        time: date.getHours() + ':' + date.getMinutes(),
+        time: {
+          clock: date.toLocaleTimeString().slice(0, 5),
+          date: date.toLocaleDateString()
+        },
         sent: true,
       });
     await firebase
@@ -35,7 +38,10 @@ const ChatRoom = props => {
       .push()
       .set({
         msg: messages,
-        time: date.getHours() + ':' + date.getMinutes(),
+        time: {
+          clock: date.toLocaleTimeString().slice(0, 5),
+          date: date.toLocaleDateString()
+        },
         sent: false,
       });
     const message = [];
@@ -67,7 +73,7 @@ const ChatRoom = props => {
           }}>
           {value.msg}
         </Text>
-        <Text style = {{fontSize: 10, color: colors.grey, margin: 4}}>{value.time}</Text>
+        <Text style = {{fontSize: 10, color: colors.grey, margin: 4}}>{value.time.clock}</Text>
       </View>
     ));
   };
