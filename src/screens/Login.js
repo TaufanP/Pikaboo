@@ -1,35 +1,41 @@
-import React, {Component, useState} from 'react';
+import React, {useState} from 'react';
 import {
+  StyleSheet,
   View,
   Text,
-  TextInput,
   StatusBar,
-  ActivityIndicator,
+  TextInput,
   TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
 import colors from '../assets/colors/colors';
 import styles from '../assets/css/styles';
 //================================================================================================================================
-import {ScrollView} from 'react-native-gesture-handler';
-//================================================================================================================================
+
 const Login = props => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorLogin, setErrorLogin] = useState(false);
 
-  const login = async (email, password) => {
-    try {
-      setLoading(true);
-      await firebase
-        .auth()
-        .signInWithEmailAndPassword(email, password)
-      setLoading(false);
-      props.navigation.navigate('Enter');
-    } catch (e) {
-      console.error(e.message);
-    }
+  const submit = async (email, password) => {
+    setLoading(true);
+    await firebase
+      .auth()
+      .signInWithEmailAndPassword('a@gmail.com', '123456')
+      .then(() => {
+        console.warn('success');
+        setErrorLogin(false);
+        setLoading(false);
+        props.navigation.navigate('Enter');
+      })
+      .catch(() => {
+        setLoading(false);
+        setErrorLogin(true);
+      });
   };
   return (
     <View style={{backgroundColor: colors.DarkBackground, flex: 1}}>
@@ -67,17 +73,16 @@ const Login = props => {
             {loading ? (
               <ActivityIndicator size="large" color={colors.primary} />
             ) : (
-              <TouchableOpacity onPress={() => login(email, password)}>
+              <TouchableOpacity onPress={() => submit(email, password)}>
                 <Text style={styles.button}>SIGN IN</Text>
               </TouchableOpacity>
             )}
           </View>
         </View>
         <View style={styles.subCont}>
-          <TouchableOpacity
-            onPress={() => props.navigation.navigate('Register')}>
+          <TouchableOpacity onPress={() => props.navigation.navigate('Register')}>
             <Text style={styles.subButton}>
-              Does not have an account?{' '}
+              Do not have an account?{' '}
               <Text style={{color: colors.primary}}>SIGN UP</Text>
             </Text>
           </TouchableOpacity>

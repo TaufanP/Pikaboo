@@ -6,6 +6,8 @@ import LoadingScreen from '../../screens/Loading';
 import Login from '../../screens/Login';
 import Profile from '../../screens/Profile'
 import Register from '../../screens/Register'
+import ChatList from '../../screens/ChatList'
+import ChatRoom from '../../screens/ChatRoom'
 //================================================================================================================================
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -18,6 +20,7 @@ const Enter = () => {
   return(
     <Tab.Navigator initialRouteName = 'Home'>
       <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="ChatList" component={ChatList} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   )
@@ -28,6 +31,7 @@ const Navigator = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LoadingScreen" headerMode="none">
         <Stack.Screen name="Enter" component={Enter} />
+        <Stack.Screen name="ChatRoom" component={ChatRoom} />
         <Stack.Screen name="LoadingScreen" component={LoadingScreen} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
