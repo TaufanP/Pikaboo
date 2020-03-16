@@ -17,5 +17,6 @@ export default colors = {
     DarkForm: '#242424',
     DarkLight: '#E6E6E6',
     grey: '#888',
-    interact: '#9E1663'
+    interact: '#9E1663',
+    fail: '#A63F3F'
 }

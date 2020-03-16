@@ -30,7 +30,7 @@ const ChatList = props => {
             <View style={styleInt.chatCont}>
               <View style={styleInt.imgThumb}>
                 <Image
-                  source={require('../assets/images/PhotoGrid_1508767006808.png')}
+                  source={require('../assets/images/default.jpg')}
                   style={{width: '100%', height: '100%', borderRadius: 100}}
                 />
               </View>

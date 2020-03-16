@@ -28,7 +28,8 @@ const ChatRoom = props => {
         msg: messages,
         time: {
           clock: date.toLocaleTimeString().slice(0, 5),
-          date: date.toLocaleDateString()
+          date:
+            date.getDate() + '/' + date.getMonth() + '/' + date.getFullYear(),
         },
         sent: true,
       });
@@ -40,7 +41,8 @@ const ChatRoom = props => {
         msg: messages,
         time: {
           clock: date.toLocaleTimeString().slice(0, 5),
-          date: date.toLocaleDateString()
+          date:
+            date.getDate() + '/' + date.getMonth() + '/' + date.getFullYear(),
         },
         sent: false,
       });
@@ -58,23 +60,43 @@ const ChatRoom = props => {
 
   const getChat = () => {
     return msg.map(value => (
-      <View
-        style={{
-          margin: 8,
-          alignItems: value.sent ? 'flex-end' : 'flex-start',
-        }}>
-        <Text
+      <>
+        <View style={{alignItems: 'center'}}>
+          <Text
+            style={{
+              backgroundColor: colors.DarkBackground,
+              color: colors.grey,
+              fontSize: !true ? 10 : 0,
+              paddingHorizontal: !true ? 8 : 0,
+              paddingVertical: !true ? 4 : 0,
+              borderRadius: 100,
+              marginTop: !true ? 8 : 0,
+            }}>
+            {!true ? '16/3/2020' : null}
+          </Text>
+        </View>
+        <View
           style={{
-            backgroundColor: value.sent ? colors.LightBackground : colors.primary,
-            borderRadius: 16,
-            paddingHorizontal: 16,
-            flex: 1,
-            padding: 8,
+            margin: 8,
+            alignItems: value.sent ? 'flex-end' : 'flex-start',
           }}>
-          {value.msg}
-        </Text>
-        <Text style = {{fontSize: 10, color: colors.grey, margin: 4}}>{value.time.clock}</Text>
-      </View>
+          <Text
+            style={{
+              backgroundColor: value.sent
+                ? colors.LightBackground
+                : colors.primary,
+              borderRadius: 16,
+              paddingHorizontal: 16,
+              flex: 1,
+              padding: 8,
+            }}>
+            {value.msg}
+          </Text>
+          <Text style={{fontSize: 10, color: colors.grey, margin: 4}}>
+            {value.time.clock}
+          </Text>
+        </View>
+      </>
     ));
   };
 
@@ -103,8 +125,12 @@ const ChatRoom = props => {
             flexDirection: 'row',
             backgroundColor: colors.DarkBackground,
             alignItems: 'center',
-            justifyContent: 'center'
-          }}><Text style = {{color: colors.LightBackground, fontSize: 24}}>Budi</Text></View>
+            justifyContent: 'center',
+          }}>
+          <Text style={{color: colors.LightBackground, fontSize: 24}}>
+            Budi
+          </Text>
+        </View>
         <View style={{height: '100%'}}>
           <ScrollView>
             {loading ? null : null}

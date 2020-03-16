@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StatusBar,
   TextInput,
+  Image,
 } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import 'firebase/firestore';
@@ -16,6 +17,13 @@ import styles from '../assets/css/styles';
 //================================================================================================================================
 
 const Profile = props => {
+  const emailRegex = /[\.\$\#\[\]]/gi;
+  const [senderEmail, setSenderEmail] = useState(
+    firebase.auth().currentUser.email.replace(emailRegex, ''),
+  );
+  const [bio, setBio] = useState();
+  const [loading, setLoading] = useState(true);
+
   const logout = () => {
     firebase
       .auth()
@@ -23,9 +31,22 @@ const Profile = props => {
       .then(props.navigation.navigate('Login'));
   };
   const data = () => {
-    // (firebase.firestore().collection('profiles').doc('WfuzsUmByKWEMcokWAv6').get().then(doc=>alert(doc.data().username)))
-    alert('tes');
+    console.warn(bio.name);
   };
+
+  useEffect(() => {
+    const firstTime = async () => {
+      await firebase
+        .database()
+        .ref('/users/' + senderEmail)
+        .once('value', snap => {
+          setBio(snap.val());
+        });
+      setLoading(false);
+    };
+    firstTime();
+  }, []);
+
   return (
     <View style={{backgroundColor: colors.DarkBackground, flex: 1}}>
       <StatusBar
@@ -40,39 +61,47 @@ const Profile = props => {
           <View style={styleInt.welcomeTextCont}>
             <Text style={styleInt.welcomeText}>
               Welcome back,{' '}
-              <Text style={{color: colors.primary}}>Tes!</Text>
+              <Text style={{color: colors.primary}}>
+                {loading === true ? 'User' : bio.name}!
+              </Text>
             </Text>
           </View>
           <View style={styleInt.profileImgCont}>
             <View style={styleInt.profileImg}>
-              {/* <Image
-                source={require('../assets/images/PhotoGrid_1508767006808.png')}
+              <Image
+                source={require('../assets/images/default.jpg')}
                 style={{width: '100%', height: '100%', borderRadius: 100}}
-              /> */}
+              />
             </View>
           </View>
           <View style={styleInt.formEdit}>
             <TextInput
-              // placeholder={loading === true ? 'Username' : username}
-              placeholderTextColor={colors.LightForm}
+              placeholder={loading === true ? 'Username' : bio.name}
+              placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
               // onChangeText={username => this.setState({username})}
             />
             <TextInput
-              // placeholder={loading === true ? 'Email' : email}
-              placeholderTextColor={colors.LightForm}
+              placeholder={loading === true ? 'Email' : bio.email}
+              placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
               // onChangeText={email => this.setState({email})}
             />
             <TextInput
               placeholder="Password"
               secureTextEntry={true}
-              placeholderTextColor={colors.LightForm}
+              placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
             />
             <TextInput
-              // placeholder={loading === true ? 'Phone Number' : phone_number}
-              placeholderTextColor={colors.LightForm}
+              placeholder={loading === true ? 'Phone Number' : bio.phone}
+              placeholderTextColor={colors.grey}
+              style={[styles.textInput, {width: '80%', marginBottom: 12}]}
+              // onChangeText={phone_number => this.setState({phone_number})}
+            />
+            <TextInput
+              placeholder={loading === true ? 'City' : bio.city}
+              placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
               // onChangeText={phone_number => this.setState({phone_number})}
             />
@@ -82,7 +111,19 @@ const Profile = props => {
               </TouchableOpacity>
             </View>
             <View style={[styles.buttonCont, {width: '80%', marginTop: 8}]}>
-              <TouchableOpacity></TouchableOpacity>
+              <TouchableOpacity onPress = {()=>logout()}>
+                <Text
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: colors.DarkBackground,
+                      color: colors.fail,
+                      paddingBottom: 32,
+                    },
+                  ]}>
+                  Logout
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
