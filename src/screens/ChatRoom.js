@@ -1,27 +1,24 @@
 import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  ActivityIndicator,
-} from 'react-native';
-import firebase from '../firebase/firebase';
+import {StyleSheet, View, Text, TextInput, Dimensions} from 'react-native';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
+//================================================================================================================================
+import firebase from '../firebase/firebase';
+import colors from '../assets/colors/colors';
+//================================================================================================================================
 
 const ChatRoom = props => {
-  const [sender, setSender] = useState('Taufan');
+  const emailRegex = /[\.\$\#\[\]]/gi;
   const [senderEmail, setSenderEmail] = useState(
-    firebase.auth().currentUser.email.replace(/[\.\$\#\[\]]/gi, ''),
+    firebase.auth().currentUser.email.replace(emailRegex, ''),
   );
-  const [receiver, setReceiver] = useState('zaki99');
   const [receiverEmail, setReceiverEmail] = useState(
-    props.route.params.replace(/[\.\$\#\[\]]/gi, ''),
+    props.route.params.replace(emailRegex, ''),
   );
   const [msg, setMsg] = useState([]);
   const [messages, setMessages] = useState('');
-  const [kosong, setKosong] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [date, setDate] = useState(new Date());
+
   const chatting = async () => {
     await firebase
       .database()
@@ -45,16 +42,12 @@ const ChatRoom = props => {
     await firebase
       .database()
       .ref('/users/' + senderEmail + '/chats/' + receiverEmail)
-      .once('value', function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
+      .once('value', snapshot => {
+        snapshot.forEach(childSnapshot => {
           message.push(childSnapshot.val());
         });
       });
     setMsg(message);
-  };
-
-  const est = () => {
-    console.warn(props);
   };
 
   const getChat = () => {
@@ -66,12 +59,15 @@ const ChatRoom = props => {
         }}>
         <Text
           style={{
-            backgroundColor: value.sent ? '#FFF' : 'green',
+            backgroundColor: value.sent ? colors.LightBackground : colors.primary,
+            borderRadius: 16,
+            paddingHorizontal: 16,
             flex: 1,
             padding: 8,
           }}>
           {value.msg}
         </Text>
+        <Text style = {{fontSize: 10, color: colors.grey, margin: 4}}>{value.time}</Text>
       </View>
     ));
   };
@@ -86,62 +82,65 @@ const ChatRoom = props => {
             msg.push(shot.val());
           });
         });
-      setKosong(false);
+      setLoading(false);
     };
     firstTime();
   }, []);
 
   return (
     <>
-      <View style={{backgroundColor: 'pink', height: '100%'}}>
-        <View style={{flex: 10}}>
+      <View style={{backgroundColor: colors.DarkForm, height: '100%'}}>
+        <View
+          style={{
+            height: 56,
+            marginTop: 0,
+            flexDirection: 'row',
+            backgroundColor: colors.DarkBackground,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}><Text style = {{color: colors.LightBackground, fontSize: 24}}>Budi</Text></View>
+        <View style={{height: '100%'}}>
           <ScrollView>
-            {kosong ? null : null}
+            {loading ? null : null}
             {msg && getChat()}
-            {/* <TouchableOpacity onPress={() => seeMsg()}>
-              <View style={{margin: 8, alignItems: 'flex-end'}}>
-                <Text style={{backgroundColor: '#FFF', flex: 1, padding: 8}}>
-                  {msg}
-                </Text>
-              </View>
-            </TouchableOpacity> */}
           </ScrollView>
         </View>
-        <View style={{flex: 1, marginTop: 16, flexDirection: 'row'}}>
+        <View
+          style={{
+            height: 56,
+            marginTop: -112,
+            flexDirection: 'row',
+            backgroundColor: colors.DarkBackground,
+            alignItems: 'center',
+          }}>
           <TextInput
             placeholder="message"
-            style={{backgroundColor: '#888', width: '50%'}}
+            placeholderTextColor={colors.grey}
+            style={{
+              backgroundColor: colors.DarkForm,
+              width: '80%',
+              borderRadius: 4,
+              height: '70%',
+              paddingLeft: 16,
+              marginLeft: 8,
+              color: colors.LightBackground,
+            }}
             onChangeText={messages => setMessages(messages)}
           />
           <View
             style={{
               justifyContent: 'center',
               alignItems: 'center',
-              width: '25%',
-              backgroundColor: 'orange',
+              width: '20%',
+              paddingRight: 8,
             }}>
             <TouchableOpacity onPress={() => chatting()}>
               <Text
                 style={{
+                  color: colors.LightBackground,
                   padding: 16,
                 }}>
                 Send
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '25%',
-              backgroundColor: 'green',
-            }}>
-            <TouchableOpacity onPress={() => est()}>
-              <Text
-                style={{
-                  padding: 16,
-                }}>
-                Get
               </Text>
             </TouchableOpacity>
           </View>
@@ -151,6 +150,15 @@ const ChatRoom = props => {
   );
 };
 
-const styles = StyleSheet.create({});
-
 export default ChatRoom;
+
+const navigationOptions = {
+  title: 'Login',
+  headerStyle: {
+    backgroundColor: '#f4511e',
+  },
+  headerTintColor: '#fff',
+  headerTitleStyle: {
+    fontWeight: 'bold',
+  },
+};

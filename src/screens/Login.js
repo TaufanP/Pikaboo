@@ -27,7 +27,6 @@ const Login = props => {
       .auth()
       .signInWithEmailAndPassword('a@gmail.com', '123456')
       .then(() => {
-        console.warn('success');
         setErrorLogin(false);
         setLoading(false);
         props.navigation.navigate('Enter');
