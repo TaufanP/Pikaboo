@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, Image} from 'react-native';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
 //================================================================================================================================
@@ -207,8 +207,12 @@ const Home = props => {
         <Marker
           coordinate={{latitude: -6.39791, longitude: 106.822083}}
           title="Depok"
-          description="Pesona Depok Estate"
-        />
+          description="Pesona Depok Estate">
+          <Image
+            source={require('../assets/images/default.jpg')}
+            style={{height: 35, width: 35, borderRadius: 100}}
+          />
+        </Marker>
       </MapView>
     </View>
   );

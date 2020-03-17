@@ -69,7 +69,7 @@ const Profile = props => {
           <View style={styleInt.profileImgCont}>
             <View style={styleInt.profileImg}>
               <Image
-                source={require('../assets/images/default.jpg')}
+                source={{uri: bio.image}}
                 style={{width: '100%', height: '100%', borderRadius: 100}}
               />
             </View>

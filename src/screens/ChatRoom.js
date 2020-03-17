@@ -12,7 +12,7 @@ const ChatRoom = props => {
     firebase.auth().currentUser.email.replace(emailRegex, ''),
   );
   const [receiverEmail, setReceiverEmail] = useState(
-    props.route.params.replace(emailRegex, ''),
+    props.route.params.email.replace(emailRegex, ''),
   );
   const [msg, setMsg] = useState([]);
   const [messages, setMessages] = useState('');
@@ -128,7 +128,7 @@ const ChatRoom = props => {
             justifyContent: 'center',
           }}>
           <Text style={{color: colors.LightBackground, fontSize: 24}}>
-            Budi
+            {props.route.params.name}
           </Text>
         </View>
         <View style={{height: '100%'}}>

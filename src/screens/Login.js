@@ -72,7 +72,7 @@ const Login = props => {
             {loading ? (
               <ActivityIndicator size="large" color={colors.primary} />
             ) : (
-              <TouchableOpacity onPress={() => submit(email, password)}>
+              <TouchableOpacity onPress={()=>submit(email, password)}>
                 <Text style={styles.button}>SIGN IN</Text>
               </TouchableOpacity>
             )}

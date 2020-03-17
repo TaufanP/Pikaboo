@@ -17,6 +17,12 @@ import styles from '../assets/css/styles';
 const ChatList = props => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [msg, setMsg] = useState([]);
+  const emailRegex = /[\.\$\#\[\]]/gi;
+  const [senderEmail, setSenderEmail] = useState(
+    firebase.auth().currentUser.email.replace(emailRegex, ''),
+  );
+  const [al, setAl] = useState('')
 
   const createChatRoom = value => {
     props.navigation.navigate('ChatRoom', value);
@@ -26,11 +32,11 @@ const ChatList = props => {
     return users.map(value => {
       return (
         <View style={{width: '100%', height: 72, marginBottom: 24}}>
-          <TouchableOpacity onPress={()=>createChatRoom(value.email)}>
+          <TouchableOpacity onPress={()=>createChatRoom(value)}>
             <View style={styleInt.chatCont}>
               <View style={styleInt.imgThumb}>
                 <Image
-                  source={require('../assets/images/default.jpg')}
+                  source={{uri: value.image}}
                   style={{width: '100%', height: '100%', borderRadius: 100}}
                 />
               </View>
@@ -47,8 +53,7 @@ const ChatList = props => {
                 </View>
                 <View style={styleInt.chat}>
                   <Text style={{color: colors.grey}}>
-                    Hi, how are you doing? Hi, how are you doing? Hi, how are
-                    you doing?
+                    {loading ? 'Start the chat!' : value.email}
                   </Text>
                 </View>
               </View>
@@ -101,7 +106,7 @@ const ChatList = props => {
 };
 const styleInt = StyleSheet.create({
   chat: {
-    flex: 1.1,
+    flex: 1,
     width: '100%',
   },
   userName: {
@@ -110,7 +115,7 @@ const styleInt = StyleSheet.create({
   },
   chatPrev: {
     flex: 3.2,
-    height: '95%',
+    height: '100%',
   },
   imgThumb: {
     paddingRight: 24,
