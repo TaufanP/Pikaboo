@@ -56,6 +56,7 @@ const ChatRoom = props => {
         });
       });
     setMsg(message);
+    setMessages('')
   };
 
   const getChat = () => {
@@ -157,6 +158,7 @@ const ChatRoom = props => {
               marginLeft: 8,
               color: colors.LightBackground,
             }}
+            value ={messages}
             onChangeText={messages => setMessages(messages)}
           />
           <View
