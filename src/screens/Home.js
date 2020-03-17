@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, View, Image} from 'react-native';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
+import colors from '../assets/colors/colors'
 //================================================================================================================================
 import MapView, {Marker} from 'react-native-maps';
 //================================================================================================================================
@@ -193,24 +194,47 @@ const customMap = [
 ];
 
 const Home = props => {
+  const emailRegex = /[\.\$\#\[\]]/gi;
+  const [loading, setLoading] = useState(true);
+  const [senderEmail, setSenderEmail] = useState(
+    firebase.auth().currentUser.email.replace(emailRegex, ''),
+  );
+  const [profile, setProfile] = useState();
+  const coordinate = {
+    latitude: -6.39781,
+    longitude: 106.822083,
+  };
+  useEffect(() => {
+    const firstTime = async () => {
+      await firebase
+        .database()
+        .ref('/users/' + senderEmail)
+        .once('value', snap => {
+          setProfile(snap.val());
+        });
+      setLoading(false);
+    };
+    firstTime();
+  }, []);
   return (
     <View style={styles.container}>
       <MapView
         customMapStyle={customMap}
         style={styles.map}
         region={{
-          latitude: -6.39791,
+          latitude: -6.39781,
           longitude: 106.822083,
-          latitudeDelta: 0.015,
-          longitudeDelta: 0.0121,
+          latitudeDelta: 1.015,
+          longitudeDelta: 0.7,
         }}>
         <Marker
-          coordinate={{latitude: -6.39791, longitude: 106.822083}}
-          title="Depok"
-          description="Pesona Depok Estate">
+          onPress={()=>console.warn(profile.location)}
+          coordinate={loading ? coordinate : profile.location}
+          title={loading ? 'Name' : profile.name}
+          description={loading ? 'Email' : profile.email}>
           <Image
-            source={require('../assets/images/default.jpg')}
-            style={{height: 35, width: 35, borderRadius: 100}}
+            source={loading ? require('../assets/images/default.jpg') : {uri:profile.image}}
+            style={{height: 35, width: 35, borderRadius: 100, borderWidth: 2, borderColor: colors.primary}}
           />
         </Marker>
       </MapView>
