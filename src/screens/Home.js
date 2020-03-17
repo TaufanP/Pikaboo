@@ -1,10 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Image} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  Text,
+  Modal,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
-import colors from '../assets/colors/colors'
+import colors from '../assets/colors/colors';
 //================================================================================================================================
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, Callout} from 'react-native-maps';
 //================================================================================================================================
 const customMap = [
   {
@@ -199,18 +207,58 @@ const Home = props => {
   const [senderEmail, setSenderEmail] = useState(
     firebase.auth().currentUser.email.replace(emailRegex, ''),
   );
-  const [profile, setProfile] = useState();
+  const [users, setUsers] = useState([]);
+  const [modal, setModal] = useState(false);
+
   const coordinate = {
     latitude: -6.39781,
     longitude: 106.822083,
   };
+
+  const setModalVisible = visible => {
+    setModal(visible);
+  };
+
+  const getUsers = () => {
+    return users.map(value => {
+      return (
+        <View>
+          <TouchableOpacity onPress={() => alert('pencet')}>
+            <Marker
+              coordinate={loading ? coordinate : value.location}
+              title={loading ? 'Name' : value.name}
+              description={loading ? 'Email' : value.email}>
+              <Image
+                source={
+                  loading
+                    ? require('../assets/images/default.jpg')
+                    : {uri: value.image}
+                }
+                style={{
+                  height: 35,
+                  width: 35,
+                  borderRadius: 100,
+                  borderWidth: 2,
+                  borderColor: colors.primary,
+                }}
+              />
+            </Marker>
+          </TouchableOpacity>
+        </View>
+      );
+    });
+  };
+
   useEffect(() => {
     const firstTime = async () => {
       await firebase
         .database()
-        .ref('/users/' + senderEmail)
+        .ref('/users/')
         .once('value', snap => {
-          setProfile(snap.val());
+          snap.forEach(shot => {
+            if (firebase.auth().currentUser.email !== shot.val().email)
+              users.push(shot.val());
+          });
         });
       setLoading(false);
     };
@@ -218,25 +266,35 @@ const Home = props => {
   }, []);
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modal}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            setModal(!modal);
+          }}>
+          <Text>Hide Modal</Text>
+        </TouchableOpacity>
+      </Modal>
       <MapView
+        onCalloutPress={() => setModalVisible(true)}
         customMapStyle={customMap}
         style={styles.map}
         region={{
           latitude: -6.39781,
           longitude: 106.822083,
-          latitudeDelta: 1.015,
-          longitudeDelta: 0.7,
+          latitudeDelta: 0.2015,
+          longitudeDelta: 0.00007,
         }}>
         <Marker
-          onPress={()=>console.warn(profile.location)}
-          coordinate={loading ? coordinate : profile.location}
-          title={loading ? 'Name' : profile.name}
-          description={loading ? 'Email' : profile.email}>
-          <Image
-            source={loading ? require('../assets/images/default.jpg') : {uri:profile.image}}
-            style={{height: 35, width: 35, borderRadius: 100, borderWidth: 2, borderColor: colors.primary}}
-          />
-        </Marker>
+          coordinate={coordinate}
+          title='User'
+          description='Email'/>
+        {users && getUsers()}
       </MapView>
     </View>
   );

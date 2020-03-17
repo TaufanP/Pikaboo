@@ -20,17 +20,22 @@ const ChatRoom = props => {
   const [date, setDate] = useState(new Date());
 
   const chatting = async () => {
+    const fullYear = date.getFullYear()
+    const dates = date.getDate()
+    const month = date.getMonth()
+    let hour = date.getHours()
+    if (hour < 10){hour = `0${hour}`}
+    let minute = date.getMinutes()
+    if (minute < 10){minute = `0${minute}`}
+    const final = `${dates}/${month}/${fullYear} ${hour}:${minute}`
+
     await firebase
       .database()
       .ref('/users/' + senderEmail + '/chats/' + receiverEmail)
       .push()
       .set({
         msg: messages,
-        time: {
-          clock: date.toLocaleTimeString().slice(0, 5),
-          date:
-            date.getDate() + '/' + date.getMonth() + '/' + date.getFullYear(),
-        },
+        time: final,
         sent: true,
       });
     await firebase
@@ -39,11 +44,7 @@ const ChatRoom = props => {
       .push()
       .set({
         msg: messages,
-        time: {
-          clock: date.toLocaleTimeString().slice(0, 5),
-          date:
-            date.getDate() + '/' + date.getMonth() + '/' + date.getFullYear(),
-        },
+        time: final,
         sent: false,
       });
     const message = [];
@@ -94,7 +95,7 @@ const ChatRoom = props => {
             {value.msg}
           </Text>
           <Text style={{fontSize: 10, color: colors.grey, margin: 4}}>
-            {value.time.clock}
+            {value.time}
           </Text>
         </View>
       </>
