@@ -10,11 +10,26 @@ import {
 } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import 'firebase/firestore';
+import RNFetchBlob from 'react-native-fetch-blob';
+import ImagePicker from 'react-native-image-picker';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
 import colors from '../assets/colors/colors';
 import styles from '../assets/css/styles';
 //================================================================================================================================
+const options = {
+  title: 'Select Avatar',
+  customButtons: [{name: 'fb', title: 'Choose Photo from Facebook'}],
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+};
+
+const Blob = RNFetchBlob.polyfill.Blob;
+const fs = RNFetchBlob.fs;
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+window.Blob = Blob;
 
 const Profile = props => {
   const emailRegex = /[\.\$\#\[\]]/gi;
@@ -23,12 +38,69 @@ const Profile = props => {
   );
   const [bio, setBio] = useState();
   const [loading, setLoading] = useState(true);
+  const [uri_image, setUri_image] = useState('');
 
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
+  const uploadImage = (uri, mime = 'application/octet-stream') => {
+    return new Promise((resolve, reject) => {
+      const uploadUri =
+        Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+      let uploadBlob = null;
+      const imageRef = firebase
+        .storage()
+        .ref('images')
+        .child('profile_' + senderEmail);
+      fs.readFile(uploadUri, 'base64')
+        .then(data => {
+          return Blob.build(data, {type: `${mime};BASE64`});
+        })
+        .then(blob => {
+          uploadBlob = blob;
+          return imageRef.put(blob, {contentType: mime});
+        })
+        .then(() => {
+          uploadBlob.close();
+          return imageRef.getDownloadURL();
+        })
+        .then(url => {
+          resolve(url);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  };
+
+  const getImage = () => {
+    ImagePicker.showImagePicker(options, response => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        // let source = { uri: response.uri };
+        // this.setState({image_uri: response.uri})
+
+        // You can also display the image using data:
+        // let image_uri = { uri: 'data:image/jpeg;base64,' + response.data };
+
+        uploadImage(response.uri)
+          .then(url => {
+            alert('uploaded');
+            setUri_image(url);
+          })
+          .catch(error => console.log(error));
+      }
+    });
+  };
   const logout = () => {
     firebase
       .auth()
@@ -39,17 +111,28 @@ const Profile = props => {
   const editProfile = async () => {
     try {
       setLoading(true);
-      await firebase
+      const updateGroup = firebase
         .database()
         .ref('users/')
-        .child(senderEmail)
-        .update({
+        .child(senderEmail);
+
+      if (uri_image === '') {
+        await updateGroup.update({
           city,
           name: username,
           phone: phone,
-          // image: uri_image
         });
-      await firebase.auth().currentUser.updatePassword(newPassword);
+      } else {
+        await updateGroup.update({
+          city,
+          name: username,
+          phone: phone,
+          image: uri_image,
+        });
+      }
+      if(newPassword !== ''){
+        await firebase.auth().currentUser.updatePassword(newPassword);
+      }
       setLoading(false);
     } catch (e) {
       console.error(e.message);
@@ -63,6 +146,9 @@ const Profile = props => {
         .ref('/users/' + senderEmail)
         .once('value', snap => {
           setBio(snap.val());
+          setUsername(snap.val().name);
+          setPhone(snap.val().phone);
+          setCity(snap.val().city)
         });
       setLoading(false);
     };
@@ -90,15 +176,20 @@ const Profile = props => {
           </View>
           <View style={styleInt.profileImgCont}>
             <View style={styleInt.profileImg}>
-              <Image
-                source={{
-                  uri:
-                    loading === true
-                      ? '../assets/images/default.jpg'
-                      : bio.image,
-                }}
-                style={{width: '100%', height: '100%', borderRadius: 100}}
-              />
+              <TouchableOpacity onPress={() => getImage()}>
+                {/* <TouchableOpacity> */}
+                <Image
+                  source={{
+                    uri:
+                      loading === true
+                        ? '../assets/images/default.jpg'
+                        : uri_image === ''
+                        ? bio.image
+                        : uri_image,
+                  }}
+                  style={{width: '100%', height: '100%', borderRadius: 100}}
+                />
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styleInt.formEdit}>
@@ -109,14 +200,14 @@ const Profile = props => {
               onChangeText={username => setUsername(username)}
             />
             <TextInput
-              editable = {false}
+              editable={false}
               placeholder={loading === true ? 'Email' : bio.email}
               placeholderTextColor={colors.LightBackground}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
             />
             <TextInput
               secureTextEntry
-              placeholder="Password"
+              placeholder="Re-type your password"
               secureTextEntry={true}
               placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
