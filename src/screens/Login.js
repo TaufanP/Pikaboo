@@ -25,7 +25,7 @@ const Login = props => {
     setLoading(true);
     await firebase
       .auth()
-      .signInWithEmailAndPassword('a@gmail.com', '123456')
+      .signInWithEmailAndPassword('d@gmail.com', '234567')
       .then(() => {
         setErrorLogin(false);
         setLoading(false);
@@ -68,18 +68,26 @@ const Login = props => {
               onChangeText={password => setPassword(password)}
             />
           </View>
+          {errorLogin ? (
+            <View>
+              <Text style={{color: colors.fail, fontSize: 16}}>
+                Incorrect email or password!
+              </Text>
+            </View>
+          ) : null}
           <View style={styles.buttonCont}>
             {loading ? (
               <ActivityIndicator size="large" color={colors.primary} />
             ) : (
-              <TouchableOpacity onPress={()=>submit(email, password)}>
+              <TouchableOpacity onPress={() => submit(email, password)}>
                 <Text style={styles.button}>SIGN IN</Text>
               </TouchableOpacity>
             )}
           </View>
         </View>
         <View style={styles.subCont}>
-          <TouchableOpacity onPress={() => props.navigation.navigate('Register')}>
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate('Register')}>
             <Text style={styles.subButton}>
               Do not have an account?{' '}
               <Text style={{color: colors.primary}}>SIGN UP</Text>

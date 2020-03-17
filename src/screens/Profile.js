@@ -24,14 +24,36 @@ const Profile = props => {
   const [bio, setBio] = useState();
   const [loading, setLoading] = useState(true);
 
+  const [username, setUsername] = useState('');
+  const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+
   const logout = () => {
     firebase
       .auth()
       .signOut()
       .then(props.navigation.navigate('Login'));
   };
-  const data = () => {
-    console.warn(bio.name);
+
+  const editProfile = async () => {
+    try {
+      setLoading(true);
+      await firebase
+        .database()
+        .ref('users/')
+        .child(senderEmail)
+        .update({
+          city,
+          name: username,
+          phone: phone,
+          // image: uri_image
+        });
+      await firebase.auth().currentUser.updatePassword(newPassword);
+      setLoading(false);
+    } catch (e) {
+      console.error(e.message);
+    }
   };
 
   useEffect(() => {
@@ -69,7 +91,12 @@ const Profile = props => {
           <View style={styleInt.profileImgCont}>
             <View style={styleInt.profileImg}>
               <Image
-                source={{uri: bio.image}}
+                source={{
+                  uri:
+                    loading === true
+                      ? '../assets/images/default.jpg'
+                      : bio.image,
+                }}
                 style={{width: '100%', height: '100%', borderRadius: 100}}
               />
             </View>
@@ -79,39 +106,42 @@ const Profile = props => {
               placeholder={loading === true ? 'Username' : bio.name}
               placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
-              // onChangeText={username => this.setState({username})}
+              onChangeText={username => setUsername(username)}
             />
             <TextInput
+              editable = {false}
               placeholder={loading === true ? 'Email' : bio.email}
-              placeholderTextColor={colors.grey}
+              placeholderTextColor={colors.LightBackground}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
-              // onChangeText={email => this.setState({email})}
             />
             <TextInput
+              secureTextEntry
               placeholder="Password"
               secureTextEntry={true}
               placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
+              onChangeText={password => setNewPassword(password)}
             />
             <TextInput
+              keyboardType="number-pad"
               placeholder={loading === true ? 'Phone Number' : bio.phone}
               placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
-              // onChangeText={phone_number => this.setState({phone_number})}
+              onChangeText={phone_number => setPhone(phone_number)}
             />
             <TextInput
               placeholder={loading === true ? 'City' : bio.city}
               placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
-              // onChangeText={phone_number => this.setState({phone_number})}
+              onChangeText={city => setCity(city)}
             />
             <View style={[styles.buttonCont, {width: '80%', marginTop: 8}]}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => editProfile()}>
                 <Text style={styles.button}>SAVE</Text>
               </TouchableOpacity>
             </View>
             <View style={[styles.buttonCont, {width: '80%', marginTop: 8}]}>
-              <TouchableOpacity onPress = {()=>logout()}>
+              <TouchableOpacity onPress={() => logout()}>
                 <Text
                   style={[
                     styles.button,
