@@ -207,7 +207,7 @@ const Profile = props => {
             />
             <TextInput
               secureTextEntry
-              placeholder="Re-type your password"
+              placeholder="Password"
               secureTextEntry={true}
               placeholderTextColor={colors.grey}
               style={[styles.textInput, {width: '80%', marginBottom: 12}]}
