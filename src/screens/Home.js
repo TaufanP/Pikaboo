@@ -11,6 +11,7 @@ import {
 //================================================================================================================================
 import firebase from '../firebase/firebase';
 import colors from '../assets/colors/colors';
+import stylest from '../assets/css/styles';
 //================================================================================================================================
 import MapView, {Marker, Callout} from 'react-native-maps';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -205,6 +206,7 @@ const customMap = [
 const Home = props => {
   const emailRegex = /[\.\$\#\[\]]/gi;
   const [loading, setLoading] = useState(true);
+  const [loadingModal, setLoadingModal] = useState(true);
   const [senderEmail, setSenderEmail] = useState(
     firebase.auth().currentUser.email.replace(emailRegex, ''),
   );
@@ -223,14 +225,15 @@ const Home = props => {
   const regionChange = region => {
     let reg = {...regionMap};
     reg.latitude = region.latitude;
-    reg.longitude = region.longitude
+    reg.longitude = region.longitude;
     reg.latitudeDelta = 0.1215;
     setRegionMap(reg);
   };
   const onUpdate = (key, loc, value) => {
     setIndek(key);
     setBioModal(value);
-    regionChange(loc)
+    setLoadingModal(false);
+    regionChange(loc);
   };
 
   const coordinate = {
@@ -274,7 +277,8 @@ const Home = props => {
   const friendLocation = () => {
     return users.map(value => {
       return (
-        <TouchableOpacity onPress={() => onUpdate(value.email, value.location, value)}>
+        <TouchableOpacity
+          onPress={() => onUpdate(value.email, value.location, value)}>
           <View
             key={value.email}
             style={{
@@ -335,16 +339,77 @@ const Home = props => {
   }, []);
   return (
     <View style={styles.container}>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modal}>
-        <TouchableOpacity
-          onPress={() => {
-            setModal(!modal);
+      <Modal animationType="slide" transparent={false} visible={modal}>
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: colors.DarkBackground,
+            justifyContent: 'center',
+            alignItems: 'center',
           }}>
-          <Text>{bioModal && bioModal.name}</Text>
-        </TouchableOpacity>
+          <Image
+            source={
+              loadingModal
+                ? require('../assets/images/default.jpg')
+                : {uri: bioModal.image}
+            }
+            style={{width: 104, height: 104, borderRadius: 200}}
+          />
+          <View>
+            <Text
+              style={{
+                paddingTop: 8,
+                fontSize: 20,
+                color: colors.LightBackground,
+                fontWeight: 'bold',
+              }}>
+              {loadingModal ? 'Name' : bioModal.name}
+            </Text>
+          </View>
+          <View>
+            <Text
+              style={{
+                marginTop: 8,
+                fontSize: 16,
+                color: colors.grey,
+              }}>
+              {loadingModal ? 'Email' : bioModal.email}
+            </Text>
+          </View>
+          <View>
+            <Text
+              style={{
+                fontSize: 16,
+                color: colors.grey,
+              }}>
+              {loadingModal ? 'city' : bioModal.city}
+            </Text>
+          </View>
+          <TouchableOpacity>
+            <Text style={[stylest.button, {width: 144, marginTop: 16}]}>
+              CHAT
+            </Text>
+          </TouchableOpacity>
+          <View style={[stylest.buttonCont, {width: '80%', marginTop: 8}]}>
+            <TouchableOpacity
+              onPress={() => {
+                setModal(!modal);
+              }}>
+              <Text
+                style={[
+                  stylest.button,
+                  {
+                    backgroundColor: colors.DarkBackground,
+                    color: colors.fail,
+                    paddingBottom: 32,
+                  },
+                ]}>
+                Back To Map
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
       <MapView
         onCalloutPress={() => setModalVisible(true)}

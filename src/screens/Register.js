@@ -6,7 +6,7 @@ import {
   StatusBar,
   ActivityIndicator,
   TouchableOpacity,
-  Image
+  Image,
 } from 'react-native';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
@@ -39,8 +39,7 @@ const Register = props => {
   const [newEmail, setNewEmail] = useState();
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [uri_image, setUri_image] = useState('');
-
+  const [uri_image, setUri_image] = useState(0);
 
   const uploadImage = (uri, mime = 'application/octet-stream') => {
     return new Promise((resolve, reject) => {
@@ -112,7 +111,7 @@ const Register = props => {
           email,
           name: username,
           phone: phone,
-          image: uri_image
+          image: uri_image,
         });
       setLoading(false);
       props.navigation.navigate('Login');
@@ -182,10 +181,14 @@ const Register = props => {
                       height: '100%',
                     }}>
                     <Image
-                      source={{
-                        uri: uri_image
-                      }}
-                      style={{flex: 1, borderRadius: 4}}
+                      source={
+                        uri_image === 0
+                          ? require('../assets/images/default.jpg')
+                          : {
+                              uri: uri_image,
+                            }
+                      }
+                      style={{width: 112, height: 106, borderRadius: 4}}
                     />
                   </View>
                 </TouchableOpacity>

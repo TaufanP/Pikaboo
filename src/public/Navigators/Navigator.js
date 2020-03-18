@@ -23,7 +23,7 @@ const Tab = createBottomTabNavigator();
 const Enter = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Chats"
+      initialRouteName="Home"
       backBehavior="none"
       tabBarOptions={{
         activeTintColor: colors.primary,
