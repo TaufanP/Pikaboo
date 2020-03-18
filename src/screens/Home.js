@@ -209,12 +209,10 @@ const Home = props => {
     firebase.auth().currentUser.email.replace(emailRegex, ''),
   );
   const [bio, setBio] = useState();
+  const [bioModal, setBioModal] = useState();
   const [users, setUsers] = useState([]);
   const [modal, setModal] = useState(false);
-  const [ray, setRay] = useState([0, 1, 2, 3, 4, 5]);
   const [indek, setIndek] = useState();
-  const [custLoc, setCustLoc] = useState();
-  const [custOn, setCustOn] = useState(false);
   const [regionMap, setRegionMap] = useState({
     latitude: -6.39781,
     longitude: 106.822083,
@@ -225,14 +223,14 @@ const Home = props => {
   const regionChange = region => {
     let reg = {...regionMap};
     reg.latitude = region.latitude;
-    reg.longitude = region.longitude;
+    reg.longitude = region.longitude
+    reg.latitudeDelta = 0.1215;
     setRegionMap(reg);
   };
-  const onUpdate = (key, loc) => {
+  const onUpdate = (key, loc, value) => {
     setIndek(key);
-    setCustLoc(loc);
+    setBioModal(value);
     regionChange(loc)
-    setCustOn(true);
   };
 
   const coordinate = {
@@ -273,10 +271,10 @@ const Home = props => {
       );
     });
   };
-  const biru = () => {
+  const friendLocation = () => {
     return users.map(value => {
       return (
-        <TouchableOpacity onPress={() => onUpdate(value.email, value.location)}>
+        <TouchableOpacity onPress={() => onUpdate(value.email, value.location, value)}>
           <View
             key={value.email}
             style={{
@@ -340,15 +338,12 @@ const Home = props => {
       <Modal
         animationType="slide"
         transparent={false}
-        visible={modal}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-        }}>
+        visible={modal}>
         <TouchableOpacity
           onPress={() => {
             setModal(!modal);
           }}>
-          <Text>Hide Modal</Text>
+          <Text>{bioModal && bioModal.name}</Text>
         </TouchableOpacity>
       </Modal>
       <MapView
@@ -388,7 +383,7 @@ const Home = props => {
                 justifyContent: 'space-around',
                 paddingTop: 8,
               }}>
-              {biru()}
+              {friendLocation()}
             </View>
           </View>
         </ScrollView>
