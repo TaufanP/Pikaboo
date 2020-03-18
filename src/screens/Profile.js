@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import 'firebase/firestore';
-import RNFetchBlob from 'react-native-fetch-blob';
+import RNFetchBlob from 'rn-fetch-blob'
 import ImagePicker from 'react-native-image-picker';
 //================================================================================================================================
 import firebase from '../firebase/firebase';

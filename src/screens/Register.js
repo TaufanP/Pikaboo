@@ -14,7 +14,7 @@ import colors from '../assets/colors/colors';
 import styles from '../assets/css/styles';
 //================================================================================================================================
 import {ScrollView} from 'react-native-gesture-handler';
-import RNFetchBlob from 'react-native-fetch-blob';
+import RNFetchBlob from 'rn-fetch-blob'
 import ImagePicker from 'react-native-image-picker';
 //================================================================================================================================
 const options = {
