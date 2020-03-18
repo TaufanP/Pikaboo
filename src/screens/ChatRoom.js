@@ -87,8 +87,11 @@ const ChatRoom = props => {
               backgroundColor: value.sent
                 ? colors.LightBackground
                 : colors.primary,
-              borderRadius: 16,
               paddingHorizontal: 16,
+              borderTopRightRadius: value.sent ? 100 : 100,
+              borderBottomLeftRadius: value.sent ? 100 : 0,
+              borderTopLeftRadius: value.sent ? 100 : 100,
+              borderBottomRightRadius: value.sent ? 0 : 100,
               flex: 1,
               padding: 8,
             }}>
@@ -134,7 +137,7 @@ const ChatRoom = props => {
           </Text>
         </View>
         <View style={{height: '100%'}}>
-          <ScrollView>
+          <ScrollView invertStickyHeaders>
             {loading ? null : null}
             {msg && getChat()}
           </ScrollView>

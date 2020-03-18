@@ -13,6 +13,7 @@ import firebase from '../firebase/firebase';
 import colors from '../assets/colors/colors';
 //================================================================================================================================
 import MapView, {Marker, Callout} from 'react-native-maps';
+import {ScrollView} from 'react-native-gesture-handler';
 //================================================================================================================================
 const customMap = [
   {
@@ -207,11 +208,35 @@ const Home = props => {
   const [senderEmail, setSenderEmail] = useState(
     firebase.auth().currentUser.email.replace(emailRegex, ''),
   );
+  const [bio, setBio] = useState();
   const [users, setUsers] = useState([]);
   const [modal, setModal] = useState(false);
+  const [ray, setRay] = useState([0, 1, 2, 3, 4, 5]);
+  const [indek, setIndek] = useState();
+  const [custLoc, setCustLoc] = useState();
+  const [custOn, setCustOn] = useState(false);
+  const [regionMap, setRegionMap] = useState({
+    latitude: -6.39781,
+    longitude: 106.822083,
+    latitudeDelta: 0.2015,
+    longitudeDelta: 0.00007,
+  });
+
+  const regionChange = region => {
+    let reg = {...regionMap};
+    reg.latitude = region.latitude;
+    reg.longitude = region.longitude;
+    setRegionMap(reg);
+  };
+  const onUpdate = (key, loc) => {
+    setIndek(key);
+    setCustLoc(loc);
+    regionChange(loc)
+    setCustOn(true);
+  };
 
   const coordinate = {
-    latitude: -6.39781,
+    latitude: -6.38781,
     longitude: 106.822083,
   };
 
@@ -248,6 +273,46 @@ const Home = props => {
       );
     });
   };
+  const biru = () => {
+    return users.map(value => {
+      return (
+        <TouchableOpacity onPress={() => onUpdate(value.email, value.location)}>
+          <View
+            key={value.email}
+            style={{
+              backgroundColor: colors.DarkBackground,
+              borderWidth: 2,
+              borderColor:
+                indek == value.email ? colors.primary : colors.DarkBackground,
+              width: 56,
+              height: 56,
+              borderRadius: 100,
+              marginRight: 16,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              source={
+                loading
+                  ? require('../assets/images/default.jpg')
+                  : {uri: value.image}
+              }
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 100,
+              }}
+            />
+          </View>
+          <View style={{alignItems: 'center', marginRight: 16}}>
+            <Text style={{color: colors.LightBackground}}>
+              {loading ? 'Name' : value.name}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      );
+    });
+  };
 
   useEffect(() => {
     const firstTime = async () => {
@@ -259,6 +324,12 @@ const Home = props => {
             if (firebase.auth().currentUser.email !== shot.val().email)
               users.push(shot.val());
           });
+        });
+      await firebase
+        .database()
+        .ref('/users/' + senderEmail)
+        .once('value', snap => {
+          setBio(snap.val());
         });
       setLoading(false);
     };
@@ -284,18 +355,44 @@ const Home = props => {
         onCalloutPress={() => setModalVisible(true)}
         customMapStyle={customMap}
         style={styles.map}
-        region={{
-          latitude: -6.39781,
-          longitude: 106.822083,
-          latitudeDelta: 0.2015,
-          longitudeDelta: 0.00007,
-        }}>
-        <Marker
-          coordinate={coordinate}
-          title='User'
-          description='Email'/>
+        region={regionMap}>
         {users && getUsers()}
+        <Marker
+          coordinate={loading ? coordinate : bio.location}
+          title={loading ? 'User' : bio.name}
+          description={loading ? 'Email' : bio.email}>
+          <Image
+            source={
+              loading
+                ? require('../assets/images/default.jpg')
+                : {uri: bio.image}
+            }
+            style={{
+              height: 35,
+              width: 35,
+              borderRadius: 100,
+              borderWidth: 2,
+              borderColor: 'gold',
+            }}
+          />
+        </Marker>
       </MapView>
+      <View>
+        <ScrollView horizontal={true} alwaysBounceHorizontal={false}>
+          <View style={{flexDirection: 'row'}}>
+            <View
+              style={{
+                // backgroundColor: 'rgba(0, 0, 0.15, 0.1)',
+                height: 80,
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                paddingTop: 8,
+              }}>
+              {biru()}
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     </View>
   );
 };
@@ -303,9 +400,10 @@ const Home = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.DarkForm,
   },
   map: {
-    flex: 1,
+    flex: 0.99,
   },
 });
 
