@@ -14,7 +14,7 @@ import colors from '../assets/colors/colors';
 import styles from '../assets/css/styles';
 //================================================================================================================================
 import {ScrollView} from 'react-native-gesture-handler';
-import RNFetchBlob from 'rn-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob';
 import ImagePicker from 'react-native-image-picker';
 //================================================================================================================================
 const options = {
@@ -99,6 +99,16 @@ const Register = props => {
   };
 
   const register = async (email, password) => {
+    let lat = `-6.3${Math.floor(Math.random() * 9)}${Math.floor(
+      Math.random() * 9,
+    )}${Math.floor(Math.random() * 9)}${Math.floor(Math.random() * 9)}`;
+    let long = `106.8${Math.floor(Math.random() * 9)}${Math.floor(
+      Math.random() * 9,
+    )}${Math.floor(Math.random() * 9)}${Math.floor(
+      Math.random() * 9,
+    )}${Math.floor(Math.random() * 9)}`;
+    lat = parseFloat(lat)
+    long = parseFloat(long)
     try {
       setLoading(true);
       await firebase.auth().createUserWithEmailAndPassword(email, password);
@@ -109,6 +119,10 @@ const Register = props => {
         .update({
           city,
           email,
+          location: {
+            latitude: lat,
+            longitude: long
+          },
           name: username,
           phone: phone,
           image: uri_image,

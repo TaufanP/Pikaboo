@@ -31,23 +31,25 @@ const LoadingScreen = props => {
     ],
   );
 
-  if (!user) {
-    props.navigation.navigate('Login');
-  }
-
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        hidden={false}
-        backgroundColor={colors.DarkBackground}
-        translucent={false}
-        networkActivityIndicatorVisible={true}
-      />
-      <View style={{marginBottom: 24}}>
-        <Text style={{color: colors.primary, fontSize: 40}}>Pikaboo!</Text>
-      </View>
-      <ActivityIndicator color={colors.primary} size="large" />
+      {!user ? (
+        props.navigation.navigate('Login')
+      ) : (
+        <>
+          <StatusBar
+            barStyle="light-content"
+            hidden={false}
+            backgroundColor={colors.DarkBackground}
+            translucent={false}
+            networkActivityIndicatorVisible={true}
+          />
+          <View style={{marginBottom: 24}}>
+            <Text style={{color: colors.primary, fontSize: 40}}>Pikaboo!</Text>
+          </View>
+          <ActivityIndicator color={colors.primary} size="large" />
+        </>
+      )}
     </View>
   );
 };

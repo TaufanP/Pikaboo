@@ -20,14 +20,18 @@ const ChatRoom = props => {
   const [date, setDate] = useState(new Date());
 
   const chatting = async () => {
-    const fullYear = date.getFullYear()
-    const dates = date.getDate()
-    const month = date.getMonth()
-    let hour = date.getHours()
-    if (hour < 10){hour = `0${hour}`}
-    let minute = date.getMinutes()
-    if (minute < 10){minute = `0${minute}`}
-    const final = `${dates}/${month}/${fullYear} ${hour}:${minute}`
+    const fullYear = date.getFullYear();
+    const dates = date.getDate();
+    const month = date.getMonth();
+    let hour = date.getHours();
+    if (hour < 10) {
+      hour = `0${hour}`;
+    }
+    let minute = date.getMinutes();
+    if (minute < 10) {
+      minute = `0${minute}`;
+    }
+    const final = `${dates}/${month}/${fullYear} ${hour}:${minute}`;
 
     await firebase
       .database()
@@ -47,17 +51,7 @@ const ChatRoom = props => {
         time: final,
         sent: false,
       });
-    const message = [];
-    await firebase
-      .database()
-      .ref('/users/' + senderEmail + '/chats/' + receiverEmail)
-      .once('value', snapshot => {
-        snapshot.forEach(childSnapshot => {
-          message.push(childSnapshot.val());
-        });
-      });
-    setMsg(message);
-    setMessages('')
+    setMessages('');
   };
 
   const getChat = () => {
@@ -107,18 +101,20 @@ const ChatRoom = props => {
 
   useEffect(() => {
     const firstTime = async () => {
+      const message = [];
       await firebase
         .database()
         .ref('/users/' + senderEmail + '/chats/' + receiverEmail)
         .once('value', snap => {
           snap.forEach(shot => {
-            msg.push(shot.val());
+            message.push(shot.val());
           });
         });
+      setMsg(message);
       setLoading(false);
     };
     firstTime();
-  }, []);
+  }, [msg]);
 
   return (
     <>
@@ -162,7 +158,7 @@ const ChatRoom = props => {
               marginLeft: 8,
               color: colors.LightBackground,
             }}
-            value ={messages}
+            value={messages}
             onChangeText={messages => setMessages(messages)}
           />
           <View

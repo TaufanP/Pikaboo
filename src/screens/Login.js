@@ -25,7 +25,7 @@ const Login = props => {
     setLoading(true);
     await firebase
       .auth()
-      .signInWithEmailAndPassword(email, password)
+      .signInWithEmailAndPassword('tes@gmail.com', '123456')
       .then(() => {
         setErrorLogin(false);
         setLoading(false);
