@@ -69,7 +69,7 @@ const Enter = () => {
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="LoadingScreen" headerMode="none">
+      <Stack.Navigator initialRouteName="Login" headerMode="none">
         <Stack.Screen name="Enter" component={Enter} />
         <Stack.Screen name="ChatRoom" component={ChatRoom}/>
         <Stack.Screen name="LoadingScreen" component={LoadingScreen} />

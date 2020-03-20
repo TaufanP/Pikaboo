@@ -9,6 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
 import colors from '../assets/colors/colors';
@@ -25,7 +26,7 @@ const Login = props => {
     setLoading(true);
     await firebase
       .auth()
-      .signInWithEmailAndPassword(username, password)
+      .signInWithEmailAndPassword(email, password)
       .then(() => {
         setErrorLogin(false);
         setLoading(false);
@@ -35,6 +36,27 @@ const Login = props => {
         setLoading(false);
         setErrorLogin(true);
       });
+  };
+
+  const storeData = async () => {
+    try {
+      await AsyncStorage.setItem('email', email);
+      console.warn('success set')
+    } catch (e) {
+      console.warn('gagal set')
+      console.warn(e)
+    }
+  };
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('email');
+      if (value !== null) {
+        console.warn('success get: ' + value)
+      }
+    } catch (e) {
+      console.warn('gagal get')
+    }
   };
   return (
     <View style={{backgroundColor: colors.DarkBackground, flex: 1}}>
@@ -79,7 +101,8 @@ const Login = props => {
             {loading ? (
               <ActivityIndicator size="large" color={colors.primary} />
             ) : (
-              <TouchableOpacity onPress={() => submit(email, password)}>
+              <TouchableOpacity onPress={() => storeData()}>
+              {/* <TouchableOpacity onPress={() => submit(email, password)}> */}
                 <Text style={styles.button}>SIGN IN</Text>
               </TouchableOpacity>
             )}
@@ -87,7 +110,8 @@ const Login = props => {
         </View>
         <View style={styles.subCont}>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('Register')}>
+            onPress={() => getData()}>
+            {/* onPress={() => props.navigation.navigate('Register')}> */}
             <Text style={styles.subButton}>
               Do not have an account?{' '}
               <Text style={{color: colors.primary}}>SIGN UP</Text>
