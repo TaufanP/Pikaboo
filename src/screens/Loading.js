@@ -7,35 +7,36 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
 import colors from '../assets/colors/colors';
 //================================================================================================================================
 
 const LoadingScreen = props => {
-  // Set an initializing state whilst Firebase connects
-  const [user, setUser] = useState(1);
+  const [user, setUser] = useState(0);
 
-  // Handle user state changes
-  const onAuthStateChanged = () => {
-    firebase.auth().onAuthStateChanged(user => {
-      alert(user);
-    });
-  };
-  const testHook = add => {
-    setUser(user + add);
+  const getData = async () => {
+    const email = await AsyncStorage.getItem('email');
+    const password = await AsyncStorage.getItem('password');
+    if (email !== null && password !== null) {
+      await firebase
+        .auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(() => {
+          props.navigation.navigate('Enter');
+        })
+        .catch(() => {
+          props.navigation.navigate('Login');
+        });
+    } else {
+      props.navigation.navigate('Login');
+    }
   };
 
-  useEffect(
-    () => {
-      // const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-      // return subscriber; // unsubscribe on unmount
-      console.warn(user)
-    },
-    [
-      /*Value that determind to re-run the useEffect*/user
-    ],
-  );
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -47,11 +48,6 @@ const LoadingScreen = props => {
           translucent={false}
           networkActivityIndicatorVisible={true}
         />
-        <View style={{marginBottom: 24}}>
-          <TouchableOpacity onPress={() => testHook(1)}>
-            <Text style={{color: colors.primary, fontSize: 40}}>{user}</Text>
-          </TouchableOpacity>
-        </View>
         <ActivityIndicator color={colors.primary} size="large" />
       </>
     </View>

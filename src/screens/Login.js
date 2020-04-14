@@ -30,6 +30,8 @@ const Login = props => {
       .then(() => {
         setErrorLogin(false);
         setLoading(false);
+        AsyncStorage.setItem('email', email);
+        AsyncStorage.setItem('password', password);
         props.navigation.navigate('Enter');
       })
       .catch(() => {
@@ -37,27 +39,7 @@ const Login = props => {
         setErrorLogin(true);
       });
   };
-
-  const storeData = async () => {
-    try {
-      await AsyncStorage.setItem('email', email);
-      console.warn('success set')
-    } catch (e) {
-      console.warn('gagal set')
-      console.warn(e)
-    }
-  };
-
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('email');
-      if (value !== null) {
-        console.warn('success get: ' + value)
-      }
-    } catch (e) {
-      console.warn('gagal get')
-    }
-  };
+  
   return (
     <View style={{backgroundColor: colors.DarkBackground, flex: 1}}>
       <StatusBar
@@ -101,8 +83,7 @@ const Login = props => {
             {loading ? (
               <ActivityIndicator size="large" color={colors.primary} />
             ) : (
-              <TouchableOpacity onPress={() => storeData()}>
-              {/* <TouchableOpacity onPress={() => submit(email, password)}> */}
+              <TouchableOpacity onPress={() => submit(email, password)}>
                 <Text style={styles.button}>SIGN IN</Text>
               </TouchableOpacity>
             )}
@@ -110,8 +91,7 @@ const Login = props => {
         </View>
         <View style={styles.subCont}>
           <TouchableOpacity
-            onPress={() => getData()}>
-            {/* onPress={() => props.navigation.navigate('Register')}> */}
+            onPress={() => props.navigation.navigate('Register')}>
             <Text style={styles.subButton}>
               Do not have an account?{' '}
               <Text style={{color: colors.primary}}>SIGN UP</Text>

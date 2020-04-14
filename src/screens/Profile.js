@@ -12,6 +12,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import 'firebase/firestore';
 import RNFetchBlob from 'rn-fetch-blob'
 import ImagePicker from 'react-native-image-picker';
+import AsyncStorage from '@react-native-community/async-storage';
 //================================================================================================================================
 import firebase from '../firebase/firebase';
 import colors from '../assets/colors/colors';
@@ -105,7 +106,11 @@ const Profile = props => {
     firebase
       .auth()
       .signOut()
-      .then(props.navigation.navigate('Login'));
+      .then(()=>{
+        AsyncStorage.removeItem('username');
+        AsyncStorage.removeItem('password');
+        props.navigation.navigate('Login');
+      });
   };
 
   const editProfile = async () => {
